@@ -2,6 +2,7 @@
 
 :root {
   color-scheme: dark;
+  --ds-font: var(--font-geist-sans);
 }
 
 * {
@@ -19,6 +20,7 @@ body {
 body {
   background: var(--ds-bg);
   color: var(--ds-text);
+  font-family: var(--font-geist-sans), sans-serif;
 }
 
 a {
