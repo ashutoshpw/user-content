@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Badge, Button, Card, Page, Row, Stack, Text } from "@repo/design-system";
+import { Badge, Button } from "@repo/design-system";
 import type {
   RenderPayload,
   RendererToParentMessage,
@@ -269,6 +269,7 @@ const payloadOptions: Record<PayloadKey, RenderPayload> = {
 
 export default function ParentHome() {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
   const [payloadKey, setPayloadKey] = useState<PayloadSelection>("ui-spec");
   const [payload, setPayload] = useState<RenderPayload>(payloadOptions["ui-spec"]);
   const [rawPayload, setRawPayload] = useState(
@@ -278,6 +279,8 @@ export default function ParentHome() {
   const [supportedKinds, setSupportedKinds] = useState<string[]>([]);
   const [lastError, setLastError] = useState<string | null>(null);
   const [iframeHeight, setIframeHeight] = useState(720);
+  const [previewWidth, setPreviewWidth] = useState(50);
+  const [isResizing, setIsResizing] = useState(false);
 
   const targetOrigin = useMemo(() => {
     try {
@@ -362,105 +365,141 @@ export default function ParentHome() {
     }
   };
 
-  return (
-    <Page
-      title="Renderer playground"
-      description="Select a payload, edit JSON if needed, and send it to the stable iframe renderer."
-      headerExtra={
-        <Badge
-          label={rendererReady ? "Renderer ready" : "Waiting for renderer"}
-          tone={rendererReady ? "success" : "warning"}
-        />
+  useEffect(() => {
+    if (!isResizing) {
+      return;
+    }
+
+    const handlePointerMove = (event: MouseEvent) => {
+      const shell = shellRef.current;
+      if (!shell) {
+        return;
       }
+
+      const bounds = shell.getBoundingClientRect();
+      const nextWidth = ((bounds.right - event.clientX) / bounds.width) * 100;
+      const clampedWidth = Math.min(75, Math.max(35, nextWidth));
+      setPreviewWidth(clampedWidth);
+    };
+
+    const handlePointerUp = () => {
+      setIsResizing(false);
+    };
+
+    document.body.style.cursor = "col-resize";
+    window.addEventListener("mousemove", handlePointerMove);
+    window.addEventListener("mouseup", handlePointerUp);
+
+    return () => {
+      document.body.style.cursor = "";
+      window.removeEventListener("mousemove", handlePointerMove);
+      window.removeEventListener("mouseup", handlePointerUp);
+    };
+  }, [isResizing]);
+
+  return (
+    <div
+      ref={shellRef}
+      className={styles.shell}
+      style={{ ["--preview-width" as string]: `${previewWidth}vw` }}
     >
-      <div className={styles.shell}>
-        <div className={styles.sidebar}>
-          <Card title="Payload" subtitle="Choose a sample">
-            <Stack gap={12}>
-              <div className={styles.modeGrid}>
-                <Button
-                  label="UI spec"
-                  variant={payloadKey === "ui-spec" ? "primary" : "ghost"}
-                  onClick={() => handleSelect("ui-spec")}
-                />
-                <Button
-                  label="UI code"
-                  variant={payloadKey === "ui-code" ? "primary" : "ghost"}
-                  onClick={() => handleSelect("ui-code")}
-                />
-                <Button
-                  label="Video spec"
-                  variant={payloadKey === "video-spec" ? "primary" : "ghost"}
-                  onClick={() => handleSelect("video-spec")}
-                />
-                <Button
-                  label="Video code"
-                  variant={payloadKey === "video-code" ? "primary" : "ghost"}
-                  onClick={() => handleSelect("video-code")}
-                />
-              </div>
-              <div className={styles.meta}>
-                <div className={styles.metaRow}>
-                  <span>Status</span>
-                  <span>{rendererReady ? "Ready" : "Waiting"}</span>
-                </div>
-                <div className={styles.metaRow}>
-                  <span>Iframe height</span>
-                  <span>{iframeHeight}px</span>
-                </div>
-                <div className={styles.metaRow}>
-                  <span>Renderer</span>
-                  <span className={styles.metaValue}>{rendererUrl}</span>
-                </div>
-              </div>
-              {!!supportedKinds.length && (
-                <Row gap={8}>
-                  {supportedKinds.map((kind) => (
-                    <Badge key={kind} label={kind} />
-                  ))}
-                </Row>
-              )}
-            </Stack>
-          </Card>
+      <div className={styles.sidebar}>
+        <header className={styles.header}>
+          <div className={styles.headerText}>
+            <h1 className={styles.title}>Parent renderer</h1>
+            <p className={styles.description}>
+              Choose a payload on the left and render it in the fixed iframe on the right.
+            </p>
+          </div>
+          <div className={styles.headerBadge}>
+            <Badge
+              label={rendererReady ? "Renderer ready" : "Waiting for renderer"}
+              tone={rendererReady ? "success" : "warning"}
+            />
+          </div>
+        </header>
 
-          <Card title="JSON" subtitle="Current payload">
-            <Stack gap={12}>
-              <textarea
-                className={styles.editor}
-                value={rawPayload}
-                onChange={(event) => setRawPayload(event.target.value)}
-              />
-              <Row gap={8}>
-                <Button label="Apply JSON" variant="primary" onClick={applyJson} />
-                <Button label="Send to renderer" onClick={sendCurrentPayload} />
-              </Row>
-              {lastError ? (
-                <div className={styles.error}>
-                  <Text value={lastError} variant="caption" />
-                </div>
-              ) : null}
-            </Stack>
-          </Card>
-        </div>
-
-        <div className={styles.preview}>
-          <Card title="Preview">
-            <div
-              className={styles.frameWrap}
-              style={{
-                minHeight: `max(90vh, ${iframeHeight}px)`,
-              }}
-            >
-              <iframe
-                ref={iframeRef}
-                src={rendererUrl}
-                title="Renderer preview"
-                className={styles.frame}
-              />
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Payload</h2>
+          </div>
+          <div className={styles.modeGrid}>
+            <Button
+              label="UI spec"
+              variant={payloadKey === "ui-spec" ? "primary" : "ghost"}
+              onClick={() => handleSelect("ui-spec")}
+            />
+            <Button
+              label="UI code"
+              variant={payloadKey === "ui-code" ? "primary" : "ghost"}
+              onClick={() => handleSelect("ui-code")}
+            />
+            <Button
+              label="Video spec"
+              variant={payloadKey === "video-spec" ? "primary" : "ghost"}
+              onClick={() => handleSelect("video-spec")}
+            />
+            <Button
+              label="Video code"
+              variant={payloadKey === "video-code" ? "primary" : "ghost"}
+              onClick={() => handleSelect("video-code")}
+            />
+          </div>
+          <div className={styles.meta}>
+            <div className={styles.metaRow}>
+              <span>Status</span>
+              <span>{rendererReady ? "Ready" : "Waiting"}</span>
             </div>
-          </Card>
-        </div>
+            <div className={styles.metaRow}>
+              <span>Iframe height</span>
+              <span>{iframeHeight}px</span>
+            </div>
+            <div className={styles.metaRow}>
+              <span>Renderer</span>
+              <span className={styles.metaValue}>{rendererUrl}</span>
+            </div>
+          </div>
+          {!!supportedKinds.length && (
+            <div className={styles.badges}>
+              {supportedKinds.map((kind) => (
+                <Badge key={kind} label={kind} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>JSON</h2>
+          </div>
+          <textarea
+            className={styles.editor}
+            value={rawPayload}
+            onChange={(event) => setRawPayload(event.target.value)}
+          />
+          <div className={styles.actions}>
+            <Button label="Apply JSON" variant="primary" onClick={applyJson} />
+            <Button label="Send to renderer" onClick={sendCurrentPayload} />
+          </div>
+          {lastError ? <div className={styles.error}>{lastError}</div> : null}
+        </section>
       </div>
-    </Page>
+
+      <button
+        type="button"
+        aria-label="Resize preview panel"
+        className={styles.handle}
+        onMouseDown={() => setIsResizing(true)}
+      />
+
+      <div className={styles.preview}>
+        <iframe
+          ref={iframeRef}
+          src={rendererUrl}
+          title="Renderer preview"
+          className={styles.frame}
+        />
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as DesignSystem from "@repo/design-system";
+import * as FramerMotion from "framer-motion";
 import * as Recharts from "recharts";
 
 type Scope = Record<string, unknown>;
@@ -8,6 +9,7 @@ export function createDependencyScope(): Scope {
   return {
     react: React,
     "@repo/design-system": DesignSystem,
+    "framer-motion": FramerMotion,
     recharts: Recharts,
   };
 }

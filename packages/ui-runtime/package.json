@@ -21,6 +21,7 @@
   "dependencies": {
     "@repo/design-system": "*",
     "@repo/runtime-protocol": "*",
+    "framer-motion": "^12.35.2",
     "react": "^19.2.0",
     "recharts": "^2.15.0",
     "sucrase": "^3.35.0",
