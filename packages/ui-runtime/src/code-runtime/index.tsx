@@ -1,6 +1,7 @@
 import React from "react";
+// @ts-ignore - Babel standalone doesn't have types
 import * as Babel from "@babel/standalone";
-import { uiRegistry } from "./registry";
+import { uiRegistry } from "../registry";
 
 const MAX_CODE_SIZE = 50000; // 50KB
 

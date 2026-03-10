@@ -126,7 +126,7 @@ export default function EmbedPage() {
           durationInFrames: payload.durationInFrames,
           width: payload.width,
           height: payload.height,
-          spec: payload.mode === "spec" ? payload.spec : undefined,
+          spec: payload.mode === "spec" ? (payload.spec as any) : undefined,
           code: payload.mode === "code" ? payload.code : undefined,
         };
 
@@ -149,7 +149,7 @@ export default function EmbedPage() {
         );
       }
 
-      throw new Error(`Unsupported payload kind/mode: ${payload.kind}/${(payload as any).mode}`);
+      throw new Error(`Unsupported payload kind/mode: ${(payload as any).kind}/${(payload as any).mode}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       sendError(message, false);

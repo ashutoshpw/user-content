@@ -77,7 +77,7 @@ async function processRenderJob(job: RenderJob) {
   });
 
   const bundleLocation = await bundle({
-    entryPoint: path.join(__dirname, "../src/remotion/index.ts"),
+    entryPoint: path.join(__dirname, "../src/remotion/index.tsx"),
     webpackOverride: (config) => config,
   });
 

@@ -187,7 +187,7 @@ export const ChartBarScene: React.FC<ChartBarSceneProps> = ({ title, data = [] }
   );
 };
 
-export const remotionRegistry = {
+export const remotionRegistry: Record<string, React.ComponentType<any>> = {
   AbsoluteFill,
   Sequence,
   Text,
@@ -200,7 +200,7 @@ export const remotionRegistry = {
   FadeIn,
   SlideUp,
   AnimatedNumber,
-} as const;
+};
 
 export type RemotionRegistryType = typeof remotionRegistry;
 export type RemotionComponentName = keyof RemotionRegistryType;

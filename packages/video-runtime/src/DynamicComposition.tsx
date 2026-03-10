@@ -1,17 +1,17 @@
 import React from "react";
-import { RenderPayload } from "@user-content/runtime-protocol";
 import { validateSpec } from "./remotion-spec/validate";
 import { RenderNode } from "./remotion-spec/render-node";
 import { VideoPayload } from "./remotion-spec/schema";
+// @ts-ignore - Babel standalone doesn't have types
 import * as Babel from "@babel/standalone";
 import { remotionRegistry } from "./remotion-spec/registry";
 import { AbsoluteFill } from "remotion";
 
 export interface DynamicCompositionProps {
-  payload: VideoPayload | null;
+  payload?: VideoPayload | null;
 }
 
-export const DynamicComposition: React.FC<DynamicCompositionProps> = ({ payload }) => {
+export const DynamicComposition: React.FC<DynamicCompositionProps> = ({ payload = null }) => {
   const [error, setError] = React.useState<string | null>(null);
   const [CodeComponent, setCodeComponent] = React.useState<React.ComponentType | null>(null);
 
