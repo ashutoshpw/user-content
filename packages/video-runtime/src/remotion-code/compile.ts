@@ -9,7 +9,7 @@ export function compileVideoCode(source: string): string {
   }
 
   const { code } = transform(source, {
-    transforms: ["typescript", "jsx"],
+    transforms: ["imports", "typescript", "jsx"],
     production: true,
   });
 
