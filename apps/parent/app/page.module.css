@@ -73,6 +73,14 @@
   gap: 8px;
 }
 
+.modeGrid :global(.ds-button.primary) {
+  color: #ffffff;
+}
+
+.actions :global(.ds-button.primary) {
+  color: #ffffff;
+}
+
 .meta {
   display: grid;
   gap: 8px;

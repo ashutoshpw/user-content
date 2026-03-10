@@ -12,6 +12,7 @@ import styles from "./page.module.css";
 
 const rendererUrl =
   process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:4749/embed";
+const previewWidthStorageKey = "parent-preview-width";
 
 const uiSpecSample: UiNode = {
   type: "Page",
@@ -364,6 +365,22 @@ export default function ParentHome() {
       setLastError(error instanceof Error ? error.message : "Invalid JSON");
     }
   };
+
+  useEffect(() => {
+    const savedWidth = window.localStorage.getItem(previewWidthStorageKey);
+    if (!savedWidth) {
+      return;
+    }
+
+    const parsedWidth = Number(savedWidth);
+    if (Number.isFinite(parsedWidth)) {
+      setPreviewWidth(Math.min(75, Math.max(35, parsedWidth)));
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(previewWidthStorageKey, String(previewWidth));
+  }, [previewWidth]);
 
   useEffect(() => {
     if (!isResizing) {
