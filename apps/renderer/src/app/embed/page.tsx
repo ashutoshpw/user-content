@@ -13,6 +13,7 @@ import { DynamicComposition, VideoPayload } from "@user-content/video-runtime";
 
 const ALLOWED_ORIGINS = process.env.NEXT_PUBLIC_ALLOWED_ORIGINS?.split(",") || [
   "http://localhost:3000",
+  "http://localhost:4419",
 ];
 
 export default function EmbedPage() {

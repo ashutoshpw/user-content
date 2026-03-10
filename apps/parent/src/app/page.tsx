@@ -4,7 +4,7 @@ import React from "react";
 import { RenderPayload } from "@user-content/runtime-protocol";
 import { IframeRenderer } from "@/components/IframeRenderer";
 
-const RENDERER_URL = process.env.NEXT_PUBLIC_RENDERER_URL || "http://localhost:3001/embed";
+const RENDERER_URL = process.env.NEXT_PUBLIC_RENDERER_URL || "http://localhost:7318/embed";
 
 const uiSpecExample: RenderPayload = {
   kind: "ui",
