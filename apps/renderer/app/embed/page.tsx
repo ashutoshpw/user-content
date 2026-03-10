@@ -34,12 +34,16 @@ export default function EmbedRuntime() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const parentOriginRef = useRef<string | null>(null);
 
-  const isOriginAllowed = useMemo(() => {
-    if (!allowedParents.length && typeof window !== "undefined") {
-      return [window.origin];
-    }
-    return allowedParents;
-  }, []);
+  const isOriginAllowed = useCallback(
+    (origin: string) => {
+      if (!allowedParents.length) {
+        return true;
+      }
+
+      return allowedParents.includes(origin);
+    },
+    [],
+  );
 
   const postToParent = useCallback((message: RendererToParentMessage) => {
     const target = parentOriginRef.current ?? "*";
@@ -56,7 +60,7 @@ export default function EmbedRuntime() {
 
   useEffect(() => {
     const handler = (event: MessageEvent<RendererLoadMessage>) => {
-      if (isOriginAllowed.length && !isOriginAllowed.includes(event.origin)) {
+      if (!isOriginAllowed(event.origin)) {
         return;
       }
 

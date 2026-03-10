@@ -101,7 +101,7 @@ export const uiRegistry: Record<UiNodeType, UiRenderer> = {
       alt={stringProp(props.alt) ?? ""}
       height={numberProp(props.height, 180)}
       width={props.width as number | string | undefined}
-      radius={numberProp(props.radius, 10)}
+      radius={numberProp(props.radius, 4)}
       fit={stringProp(props.fit) === "contain" ? "contain" : "cover"}
     />
   ),

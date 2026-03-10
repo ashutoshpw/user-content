@@ -82,7 +82,7 @@ export const videoRegistry: Record<VideoNodeType, VideoRenderer> = {
           width: stringOrNumber(props.width) ?? "100%",
           height: stringOrNumber(props.height) ?? "100%",
           objectFit: fitProp(props.fit) ?? "cover",
-          borderRadius: numberProp(props.radius, 16),
+          borderRadius: numberProp(props.radius, 4),
         }}
       />
     </AbsoluteFill>
@@ -265,7 +265,7 @@ const ChartBarScene: React.FC<{
                   dataKey={key}
                   stackId="stack"
                   fill={colors[idx % colors.length]}
-                  radius={[6, 6, 0, 0]}
+                  radius={[4, 4, 0, 0]}
                 />
               ))}
             </BarChart>

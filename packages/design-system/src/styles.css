@@ -11,8 +11,23 @@
   --ds-text: #e7ecf7;
   --ds-muted: #9fb1d3;
   --ds-grid: rgba(255, 255, 255, 0.05);
-  --ds-radius: 14px;
+  --ds-radius: 4px;
   --ds-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+:root[data-theme="light"] {
+  --ds-bg: #f5f5f8;
+  --ds-surface: #ffffff;
+  --ds-surface-muted: #f3f4f6;
+  --ds-border: #e5e7eb;
+  --ds-primary: #2563eb;
+  --ds-primary-strong: #1d4ed8;
+  --ds-accent: #7c3aed;
+  --ds-warning: #d97706;
+  --ds-danger: #dc2626;
+  --ds-text: #0f172a;
+  --ds-muted: #6b7280;
+  --ds-grid: rgba(15, 23, 42, 0.06);
 }
 
 .ds-page {
@@ -22,15 +37,26 @@
     linear-gradient(180deg, #0b1221, #0a0f1b);
   color: var(--ds-text);
   font-family: var(--ds-font);
-  padding: 32px;
+  padding: 0px;
+}
+
+:root[data-theme="light"] .ds-page {
+  background: radial-gradient(circle at 20% 20%, #e5e7eb, #f5f5f8 45%),
+    radial-gradient(circle at 80% 0%, #e0f2fe, #f5f5f8 40%),
+    linear-gradient(180deg, #f9fafb, #e5e7eb);
 }
 
 .ds-surface {
   background: linear-gradient(145deg, var(--ds-surface), var(--ds-surface-muted));
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius);
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+:root[data-theme="light"] .ds-surface {
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
 }
 
 .ds-grid {
@@ -65,7 +91,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  border-radius: 999px;
+  border-radius: 4px;
   border: 1px solid var(--ds-border);
   color: var(--ds-text);
   background: rgba(255, 255, 255, 0.04);
@@ -93,7 +119,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--ds-border);
   font-weight: 600;
@@ -158,14 +184,14 @@
   display: inline-flex;
   gap: 8px;
   padding: 6px;
-  border-radius: 999px;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--ds-border);
 }
 
 .ds-tab {
   padding: 8px 12px;
-  border-radius: 999px;
+  border-radius: 4px;
   color: var(--ds-muted);
   border: 1px solid transparent;
   cursor: pointer;
