@@ -2,13 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Player } from "@remotion/player";
-import {
-  Badge,
-  Card,
-  Page,
-  Stack,
-  Text,
-} from "@repo/design-system";
+import { Card, Text } from "@repo/design-system";
 import type {
   RenderPayload,
   RendererLoadMessage,
@@ -30,7 +24,6 @@ const allowedParents =
 export default function EmbedRuntime() {
   const [payload, setPayload] = useState<RenderPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState("waiting");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const parentOriginRef = useRef<string | null>(null);
 
@@ -66,7 +59,6 @@ export default function EmbedRuntime() {
 
       if (!event.data || event.data.type !== "renderer:load") return;
       parentOriginRef.current = event.origin;
-      setStatus("loaded");
       setError(null);
       setPayload(event.data.payload);
     };
@@ -101,11 +93,7 @@ export default function EmbedRuntime() {
 
   const content = useMemo(() => {
     if (!payload) {
-      return (
-        <Card title="Awaiting payload">
-          <Text value="Send renderer:load from the parent to render content." />
-        </Card>
-      );
+      return null;
     }
 
     if (payload.kind === "ui") {
@@ -157,21 +145,13 @@ export default function EmbedRuntime() {
   }, [payload, handleRuntimeError]);
 
   return (
-    <Page
-      title="Renderer runtime"
-      description="Stable iframe surface for ui-spec / video-spec payloads."
-      headerExtra={<Badge label={`Status: ${status}`} tone="success" />}
-    >
-      <div ref={containerRef}>
-        <Stack gap={12}>
-          {error ? (
-            <Card title="Runtime error" subtitle="Propagated to parent">
-              <Text value={error} />
-            </Card>
-          ) : null}
-          {content}
-        </Stack>
-      </div>
-    </Page>
+    <div ref={containerRef}>
+      {error ? (
+        <Card title="Runtime error" subtitle="Propagated to parent">
+          <Text value={error} />
+        </Card>
+      ) : null}
+      {content}
+    </div>
   );
 }
