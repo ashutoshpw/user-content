@@ -1,0 +1,38 @@
+{
+  "name": "@repo/ui-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts",
+    "./validate": "./src/validate.ts",
+    "./registry": "./src/registry.tsx",
+    "./render-node": "./src/render-node.tsx",
+    "./code-runtime/compile": "./src/code-runtime/compile.ts",
+    "./code-runtime/execute": "./src/code-runtime/execute.ts",
+    "./code-runtime/dependency-scope": "./src/code-runtime/dependency-scope.ts",
+    "./code-runtime/error-boundary": "./src/code-runtime/error-boundary.tsx"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@repo/design-system": "*",
+    "@repo/runtime-protocol": "*",
+    "react": "^19.2.0",
+    "recharts": "^2.15.0",
+    "sucrase": "^3.35.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "^22.15.3",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2"
+  }
+}

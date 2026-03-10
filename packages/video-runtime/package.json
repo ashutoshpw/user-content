@@ -1,0 +1,39 @@
+{
+  "name": "@repo/video-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./DynamicComposition": "./src/DynamicComposition.tsx",
+    "./remotion-spec/schema": "./src/remotion-spec/schema.ts",
+    "./remotion-spec/validate": "./src/remotion-spec/validate.ts",
+    "./remotion-spec/registry": "./src/remotion-spec/registry.tsx",
+    "./remotion-spec/render-node": "./src/remotion-spec/render-node.tsx",
+    "./remotion-code/compile": "./src/remotion-code/compile.ts",
+    "./remotion-code/execute": "./src/remotion-code/execute.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/player": "^4.0.185",
+    "@repo/design-system": "*",
+    "@repo/runtime-protocol": "*",
+    "react": "^19.2.0",
+    "recharts": "^2.15.0",
+    "remotion": "^4.0.185",
+    "sucrase": "^3.35.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "^22.15.3",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2"
+  }
+}
