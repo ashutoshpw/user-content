@@ -24,7 +24,7 @@ export const IframeRenderer: React.FC<IframeRendererProps> = ({
 }) => {
   const iframeRef = React.useRef<HTMLIFrameElement>(null);
   const [isReady, setIsReady] = React.useState(false);
-  const [height, setHeight] = React.useState(600);
+  const [, setHeight] = React.useState(600);
 
   React.useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -75,9 +75,8 @@ export const IframeRenderer: React.FC<IframeRendererProps> = ({
       src={rendererUrl}
       style={{
         width: "100%",
-        height: `${height}px`,
-        border: "1px solid #e0e0e0",
-        borderRadius: "8px",
+        height: "100%",
+        border: "none",
       }}
       title="Renderer"
     />

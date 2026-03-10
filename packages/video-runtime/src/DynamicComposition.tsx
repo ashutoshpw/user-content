@@ -26,6 +26,7 @@ export const DynamicComposition: React.FC<DynamicCompositionProps> = ({ payload 
       try {
         const compiledCode = Babel.transform(payload.code, {
           presets: ["react", "typescript"],
+          plugins: ["transform-modules-commonjs"],
           filename: "component.tsx",
         }).code;
 
@@ -38,7 +39,13 @@ export const DynamicComposition: React.FC<DynamicCompositionProps> = ({ payload 
           ...remotionRegistry,
         };
 
-        const fn = new Function(...Object.keys(allowedGlobals), `return (${compiledCode})`);
+        const wrapper = `
+          const exports = {};
+          const module = { exports };
+          ${compiledCode}
+          return exports.default || module.exports?.default || module.exports || exports;
+        `;
+        const fn = new Function(...Object.keys(allowedGlobals), wrapper);
         const component = fn(...Object.values(allowedGlobals));
 
         if (typeof component === "function") {
