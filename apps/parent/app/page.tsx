@@ -22,7 +22,7 @@ import type { UiNode } from "@repo/ui-runtime";
 import type { VideoNode } from "@repo/video-runtime";
 
 const rendererUrl =
-  process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:3001/embed";
+  process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:4749/embed";
 
 const uiSpecSample: UiNode = {
   type: "Page",
