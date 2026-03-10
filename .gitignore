@@ -1,0 +1,31 @@
+# Dependencies
+node_modules
+.bun
+bun.lockb
+
+# Build outputs
+dist
+build
+.next
+.turbo
+
+# Environment files
+.env.local
+.env*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Temp files
+/tmp

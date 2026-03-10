@@ -1,0 +1,21 @@
+{
+  "name": "@user-content/ui-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@babel/standalone": "^7.26.5",
+    "@user-content/design-system": "workspace:*",
+    "react": "^18.3.1",
+    "recharts": "^2.15.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "typescript": "^5.7.2"
+  }
+}
