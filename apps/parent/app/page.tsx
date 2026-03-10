@@ -1,25 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Badge,
-  Button,
-  Card,
-  Divider,
-  Grid,
-  Metric,
-  Page,
-  Row,
-  Stack,
-  Table,
-  Text,
-} from "@repo/design-system";
+import { Badge, Button, Card, Page, Row, Stack, Text } from "@repo/design-system";
 import type {
   RenderPayload,
   RendererToParentMessage,
 } from "@repo/runtime-protocol";
 import type { UiNode } from "@repo/ui-runtime";
 import type { VideoNode } from "@repo/video-runtime";
+import styles from "./page.module.css";
 
 const rendererUrl =
   process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:4749/embed";
@@ -252,7 +241,6 @@ export default function VideoCode() {
   );
 }`;
 
-type EventLog = { type: string; message: string; ts: number };
 type PayloadKey = "ui-spec" | "ui-code" | "video-spec" | "video-code";
 type PayloadSelection = PayloadKey | "custom";
 
@@ -290,8 +278,6 @@ export default function ParentHome() {
   const [supportedKinds, setSupportedKinds] = useState<string[]>([]);
   const [lastError, setLastError] = useState<string | null>(null);
   const [iframeHeight, setIframeHeight] = useState(720);
-  const [isLightTheme, setIsLightTheme] = useState(false);
-  const [events, setEvents] = useState<EventLog[]>([]);
 
   const targetOrigin = useMemo(() => {
     try {
@@ -299,12 +285,6 @@ export default function ParentHome() {
     } catch {
       return "*";
     }
-  }, []);
-
-  const logEvent = useCallback((type: string, message: string) => {
-    setEvents((prev) =>
-      [{ type, message, ts: Date.now() }, ...prev].slice(0, 12),
-    );
   }, []);
 
   const sendPayload = useCallback(
@@ -319,9 +299,8 @@ export default function ParentHome() {
         },
         targetOrigin,
       );
-      logEvent("renderer:load", `Sent ${next.kind}-${next.mode} payload`);
     },
-    [logEvent, targetOrigin],
+    [targetOrigin],
   );
 
   useEffect(() => {
@@ -333,24 +312,21 @@ export default function ParentHome() {
       if (message.type === "renderer:ready") {
         setRendererReady(true);
         setSupportedKinds(message.supportedKinds);
-        logEvent("renderer:ready", "Renderer reported ready");
         sendPayload(payload);
       }
 
       if (message.type === "renderer:resize") {
         setIframeHeight(message.height);
-        logEvent("renderer:resize", `Height -> ${message.height}px`);
       }
 
       if (message.type === "renderer:error") {
         setLastError(message.message);
-        logEvent("renderer:error", message.message);
       }
     };
 
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [payload, sendPayload, logEvent]);
+  }, [payload, sendPayload]);
 
   const handleSelect = (key: PayloadKey) => {
     setPayloadKey(key);
@@ -369,7 +345,6 @@ export default function ParentHome() {
       setPayloadKey("custom");
       if (rendererReady) sendPayload(parsed);
       setLastError(null);
-      logEvent("payload:update", "Applied custom JSON payload");
     } catch (error) {
       setLastError(error instanceof Error ? error.message : "Invalid JSON");
     }
@@ -382,56 +357,27 @@ export default function ParentHome() {
       setPayloadKey("custom");
       if (rendererReady) sendPayload(parsed);
       setLastError(null);
-      logEvent("renderer:load", `Sent ${parsed.kind}-${parsed.mode} payload from editor`);
     } catch (error) {
       setLastError(error instanceof Error ? error.message : "Invalid JSON");
     }
   };
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isLightTheme) {
-      root.dataset.theme = "light";
-    } else {
-      delete root.dataset.theme;
-    }
-  }, [isLightTheme]);
-
   return (
     <Page
-      title="Parent ↔ Renderer orchestration"
-      description="Load one stable iframe URL, wait for renderer:ready, then stream ui-spec or video-spec payloads. Resize and errors flow back to the parent."
+      title="Renderer playground"
+      description="Select a payload, edit JSON if needed, and send it to the stable iframe renderer."
       headerExtra={
-        <Row gap={8}>
-          <Badge
-            label={rendererReady ? "Renderer ready" : "Waiting"}
-            tone={rendererReady ? "success" : "warning"}
-          />
-          <Button
-            label={isLightTheme ? "Light theme" : "Dark theme"}
-            variant="ghost"
-            onClick={() => setIsLightTheme((prev) => !prev)}
-          />
-        </Row>
+        <Badge
+          label={rendererReady ? "Renderer ready" : "Waiting for renderer"}
+          tone={rendererReady ? "success" : "warning"}
+        />
       }
     >
-      <div
-        style={{
-          minHeight: 720,
-        }}
-      >
-        <Grid columns={2} gap={16}>
-          <div
-            style={{
-              height: "100%",
-            }}
-          >
-            <Stack gap={16} style={{ height: "100%" }}>
-          <Card
-            title="Runtime payloads"
-            subtitle="Choose a sample or inject your own JSON payload."
-            actions={
-              <Row gap={8}>
+      <div className={styles.shell}>
+        <div className={styles.sidebar}>
+          <Card title="Payload" subtitle="Choose a sample">
+            <Stack gap={12}>
+              <div className={styles.modeGrid}>
                 <Button
                   label="UI spec"
                   variant={payloadKey === "ui-spec" ? "primary" : "ghost"}
@@ -452,110 +398,68 @@ export default function ParentHome() {
                   variant={payloadKey === "video-code" ? "primary" : "ghost"}
                   onClick={() => handleSelect("video-code")}
                 />
-              </Row>
-            }
-          >
-            <Grid columns={2} gap={12}>
-              <div>
-                <Text value="Payload JSON" variant="subtitle" />
-                <textarea
-                  value={rawPayload}
-                  onChange={(event) => setRawPayload(event.target.value)}
-                  style={{
-                    width: "100%",
-                    minHeight: 280,
-                    marginTop: 8,
-                    background: "rgba(255,255,255,0.03)",
-                    color: "var(--ds-text)",
-                    border: "1px solid var(--ds-border)",
-                    borderRadius: 12,
-                    padding: 12,
-                    fontFamily: "ui-monospace, SFMono-Regular",
-                  }}
-                />
-                <Row gap={8} style={{ marginTop: 8 }}>
-                  <Button label="Apply JSON" variant="primary" onClick={applyJson} />
-                  <Button
-                    label="Send to renderer"
-                    onClick={sendCurrentPayload}
-                  />
-                </Row>
               </div>
-              <Stack gap={12}>
-                <Text value="Renderer status" variant="subtitle" />
-                <Grid columns={2} gap={8}>
-                  <Metric
-                    label="Ready"
-                    value={rendererReady ? "Yes" : "No"}
-                    delta={rendererReady ? 1 : -1}
-                  />
-                  <Metric
-                    label="Iframe height"
-                    value={`${iframeHeight}px`}
-                    delta={0}
-                  />
-                </Grid>
-                <Divider />
-                <Text value="Supported kinds" variant="caption" muted />
-                <Row gap={6}>
+              <div className={styles.meta}>
+                <div className={styles.metaRow}>
+                  <span>Status</span>
+                  <span>{rendererReady ? "Ready" : "Waiting"}</span>
+                </div>
+                <div className={styles.metaRow}>
+                  <span>Iframe height</span>
+                  <span>{iframeHeight}px</span>
+                </div>
+                <div className={styles.metaRow}>
+                  <span>Renderer</span>
+                  <span className={styles.metaValue}>{rendererUrl}</span>
+                </div>
+              </div>
+              {!!supportedKinds.length && (
+                <Row gap={8}>
                   {supportedKinds.map((kind) => (
                     <Badge key={kind} label={kind} />
                   ))}
                 </Row>
-                {lastError ? (
-                  <Card title="Latest error" subtitle="renderer:error message">
-                    <Text value={lastError} />
-                  </Card>
-                ) : null}
-              </Stack>
-            </Grid>
+              )}
+            </Stack>
           </Card>
 
-              <Card title="Transport events" subtitle="renderer:ready, resize, error">
-                <Table
-                  columns={[
-                    { key: "type", label: "Type" },
-                    { key: "message", label: "Message" },
-                    { key: "ts", label: "Timestamp" },
-                  ]}
-                  rows={events.map((event) => ({
-                    type: event.type,
-                    message: event.message,
-                    ts: new Date(event.ts).toLocaleTimeString(),
-                  }))}
-                />
-              </Card>
+          <Card title="JSON" subtitle="Current payload">
+            <Stack gap={12}>
+              <textarea
+                className={styles.editor}
+                value={rawPayload}
+                onChange={(event) => setRawPayload(event.target.value)}
+              />
+              <Row gap={8}>
+                <Button label="Apply JSON" variant="primary" onClick={applyJson} />
+                <Button label="Send to renderer" onClick={sendCurrentPayload} />
+              </Row>
+              {lastError ? (
+                <div className={styles.error}>
+                  <Text value={lastError} variant="caption" />
+                </div>
+              ) : null}
             </Stack>
-          </div>
+          </Card>
+        </div>
 
-          <div
-            style={{
-              height: "100%",
-            }}
-          >
-            <Card title="Renderer iframe" subtitle={rendererUrl}>
-              <div
-                style={{
-                  height: "100%",
-                  minHeight: `max(90vh, ${iframeHeight}px)`,
-                }}
-              >
-                <iframe
-                  ref={iframeRef}
-                  src={rendererUrl}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    minHeight: `max(90vh, ${iframeHeight}px)`,
-                    border: "1px solid var(--ds-border)",
-                    borderRadius: 12,
-                    background: "#0b1221",
-                  }}
-                />
-              </div>
-            </Card>
-          </div>
-        </Grid>
+        <div className={styles.preview}>
+          <Card title="Preview">
+            <div
+              className={styles.frameWrap}
+              style={{
+                minHeight: `max(90vh, ${iframeHeight}px)`,
+              }}
+            >
+              <iframe
+                ref={iframeRef}
+                src={rendererUrl}
+                title="Renderer preview"
+                className={styles.frame}
+              />
+            </div>
+          </Card>
+        </div>
       </div>
     </Page>
   );
